@@ -1,6 +1,6 @@
 const asyncErrorHandler = require('../middleware/ErrorHandler');
 const Order = require('../models/order');
-const Product = require('../models/product');
+const {callMicroService} = require('../middleware/microServiceHandler');
 const ErrorHandler = require('../utils/SyncErrorHandler');
 const sendEmail = require('../utils/sendEmails');
 
@@ -51,7 +51,7 @@ module.exports = {
     //Get single Order Detail
     getSingleOrderDetails: asyncErrorHandler(async (req, res, next) => {
 
-        const order = await Order.findById(req.params.id).populate("user", "name email");
+        const order = await Order.findById(req.params.id)
 
         if (!order) {
             return next(new ErrorHandler("Order Not Found", 404));
@@ -119,7 +119,9 @@ module.exports = {
         if (req.body.status === "Shipped") {
             order.shippedAt = Date.now();
             order.orderItems.forEach(async (i) => {
-                await updateStock(i.product, i.quantity)
+                req.body.id=i.product
+                req.body.quantity=i.quantity
+                await callMicroService(req, 'UpdateProductStock')
             });
         }
 
@@ -148,11 +150,4 @@ module.exports = {
             success: true,
         });
     })
-}
-
-
-const updateStock= async(id, quantity)=> {
-    const product = await Product.findById(id);
-    product.stock -= quantity;
-    await product.save({ validateBeforeSave: false });
 }
