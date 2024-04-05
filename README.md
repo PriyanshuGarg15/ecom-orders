@@ -2,7 +2,7 @@
 
 The Order Microservice handles various operations related to orders, including order creation, retrieval of order details, and administrative tasks. It ensures smooth processing of orders placed by users and facilitates efficient management of the order lifecycle.
 
-The microservice is hosted on AWS at the following URL:
+The microservice is hosted on AWS ECS Docker at the following URL:
 
 http://ecom-user-lb-321143357.ap-south-1.elb.amazonaws.com:4042
 
